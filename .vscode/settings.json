@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "*.astro": "astro"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "emmet.includeLanguages": {
+    "astro": "html"
+  },
+  "svg.preview.mode": "svg"
+}
