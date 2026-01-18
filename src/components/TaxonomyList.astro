@@ -1,0 +1,36 @@
+---
+type TaxonomyCount = {
+  name: string;
+  slug: string;
+  count: number;
+};
+
+interface Props {
+  title: string;
+  items: TaxonomyCount[];
+  type: "category" | "tag";
+  emptyMessage?: string;
+}
+
+const { title, items, type, emptyMessage } = Astro.props;
+const defaultEmptyMessage =
+  type === "category" ? "カテゴリが存在しない" : "タグが存在しない";
+---
+
+<h2>{title}</h2>
+{
+  items.length > 0 ? (
+    <ul>
+      {items.map((item) => (
+        <li>
+          <a href={`/taxonomy/${type}/${item.slug}/`}>
+            {type === "tag" && "#"}
+            {item.name} ({item.count})
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>{emptyMessage ?? defaultEmptyMessage}</p>
+  )
+}

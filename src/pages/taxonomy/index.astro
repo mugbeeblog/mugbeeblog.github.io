@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TaxonomyList from "../../components/TaxonomyList.astro";
+import { getCollection } from "astro:content";
+import { countTaxonomies } from "../../utils/taxonomy";
+
+const posts = await getCollection("blogs");
+
+const categories = countTaxonomies(posts, (post) => post.data.category);
+const tags = countTaxonomies(posts, (post) => post.data.tags);
+---
+
+<BaseLayout title="カテゴリ・タグの一覧" description="" noindex={true}>
+  <main>
+    <h1>カテゴリ・タグの一覧</h1>
+    <section>
+      <TaxonomyList title="カテゴリ一覧" items={categories} type="category" />
+    </section>
+    <section>
+      <TaxonomyList title="タグ一覧" items={tags} type="tag" />
+    </section>
+  </main>
+</BaseLayout>
