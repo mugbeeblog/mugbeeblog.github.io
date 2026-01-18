@@ -25,6 +25,8 @@ jobs:
         uses: withastro/action@v3
         with:
           node-version: 20
+        env:
+          PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
 
   deploy:
     needs: build
