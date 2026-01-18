@@ -1,4 +1,6 @@
 import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
+import { PLATFORMS } from "./consts/platforms";
 import { createMicroCMSLoader } from "./content/microcms";
 
 const microCMSDateFieldsSchema = z.object({
@@ -31,6 +33,20 @@ const relatedPostsSchema = z
   )
   .optional();
 
+const platformSchema = z.enum(PLATFORMS);
+
+const messages = defineCollection({
+  loader: glob({
+    pattern: "**/*.md",
+    base: "./src/content/messages",
+  }),
+  schema: z.object({
+    date: z.string().transform((str) => new Date(str)),
+    platform: platformSchema,
+    url: z.string().url().optional(),
+  }),
+});
+
 const blogs = defineCollection({
   loader: createMicroCMSLoader("blogs"),
   schema: z
@@ -52,5 +68,6 @@ const blogs = defineCollection({
 });
 
 export const collections = {
+  messages,
   blogs,
 };
