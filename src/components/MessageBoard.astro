@@ -1,13 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-
-const PLATFORM_CONFIG = {
-  youtube: { label: "YouTube", color: "#f00" },
-  info: { label: "お知らせ", color: "#666" },
-} as const;
-
-type Platform = keyof typeof PLATFORM_CONFIG;
+import { PLATFORM_CONFIG, type Platform } from "../consts/platforms";
 
 const MAX_MESSAGES = 3;
 

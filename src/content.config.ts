@@ -1,5 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { PLATFORMS } from "./consts/platforms";
 import { createMicroCMSLoader } from "./content/microcms";
 
 const microCMSDateFieldsSchema = z.object({
@@ -32,7 +33,7 @@ const relatedPostsSchema = z
   )
   .optional();
 
-const platformSchema = z.enum(["info", "youtube"]);
+const platformSchema = z.enum(PLATFORMS);
 
 const messages = defineCollection({
   loader: glob({
