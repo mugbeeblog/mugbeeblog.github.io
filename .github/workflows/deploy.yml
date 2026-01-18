@@ -27,6 +27,8 @@ jobs:
           node-version: 20
         env:
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
+          MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
 
   deploy:
     needs: build
