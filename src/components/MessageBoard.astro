@@ -1,0 +1,101 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+const PLATFORM_CONFIG = {
+  youtube: { label: "YouTube", color: "#f00" },
+  info: { label: "お知らせ", color: "#666" },
+} as const;
+
+type Platform = keyof typeof PLATFORM_CONFIG;
+
+const MAX_MESSAGES = 3;
+
+const toJSTMidnight = (date: Date): Date => {
+  const formatter = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const parts = formatter.formatToParts(date);
+  const year = parts.find((p) => p.type === "year")?.value;
+  const month = parts.find((p) => p.type === "month")?.value;
+  const day = parts.find((p) => p.type === "day")?.value;
+
+  return new Date(`${year}-${month}-${day}T00:00:00+09:00`);
+};
+
+const getRelativeDate = (date: Date): string => {
+  const now = toJSTMidnight(new Date());
+  const target = toJSTMidnight(date);
+
+  const diffDays = Math.floor(
+    (now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (diffDays === 0) return "今日";
+  if (diffDays === 1) return "昨日";
+  if (diffDays < 0) return "未来";
+  return `${diffDays}日前`;
+};
+
+const sortByDate = (
+  messages: CollectionEntry<"messages">[],
+): CollectionEntry<"messages">[] =>
+  [...messages].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const messages = await getCollection("messages");
+const recentMessages = sortByDate(messages).slice(0, MAX_MESSAGES);
+
+const renderedMessages = await Promise.all(
+  recentMessages.map(async (message) => {
+    const { Content } = await render(message);
+    const config = PLATFORM_CONFIG[message.data.platform as Platform];
+
+    return {
+      platform: message.data.platform,
+      date: message.data.date,
+      url: message.data.url,
+      label: config.label,
+      color: config.color,
+      Content,
+    };
+  }),
+);
+---
+
+{
+  renderedMessages.length > 0 && (
+    <ul>
+      {renderedMessages.map(
+        ({ platform, date, url, label, color, Content }) => (
+          <li data-platform={platform}>
+            <span style={`--platform-color: ${color}`}>{label}</span>
+
+            <time
+              datetime={date.toISOString()}
+              title={date.toLocaleDateString("ja-JP", {
+                timeZone: "Asia/Tokyo",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            >
+              {getRelativeDate(date)}
+            </time>
+
+            {url ? (
+              <a href={url}>
+                <Content />
+              </a>
+            ) : (
+              <Content />
+            )}
+          </li>
+        ),
+      )}
+    </ul>
+  )
+}
