@@ -4,6 +4,7 @@ import "../styles/base/global.scss";
 import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import MessageBoard from "../components/MessageBoard.astro";
 
 const GTM_ID = import.meta.env.PUBLIC_GTM_ID;
 ---
@@ -46,6 +47,8 @@ const GTM_ID = import.meta.env.PUBLIC_GTM_ID;
       )
     }
     <Header />
+
+    <MessageBoard />
 
     <slot />
 
