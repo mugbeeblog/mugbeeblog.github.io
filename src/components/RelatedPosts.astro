@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import { optimizeImageUrl } from "../utils/optimizeImage";
+import { IMAGE_PRESETS } from "../consts/imagePresets";
+
+type Blog = CollectionEntry<"blogs">;
+
+interface Props {
+  contents: Blog[];
+  title: string;
+}
+
+const DEFAULT_THUMBNAIL_PATH = "/images/no-images.webp";
+
+const { contents, title } = Astro.props;
+---
+
+{
+  contents.length > 0 && (
+    <aside>
+      <h3>{title}</h3>
+
+      <ul>
+        {contents.map((item) => {
+          const thumbnail = item.data.thumbnail;
+          const thumbnailUrl = thumbnail?.url ?? DEFAULT_THUMBNAIL_PATH;
+
+          const optimizedUrl = optimizeImageUrl(
+            thumbnailUrl,
+            IMAGE_PRESETS.thumbnail,
+          );
+
+          return (
+            <li>
+              <a href={`/${item.data.slug}/`}>
+                <Image
+                  src={optimizedUrl}
+                  alt={item.data.title}
+                  width={200}
+                  height={150}
+                />
+
+                <h4>{item.data.title}</h4>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
+  )
+}
