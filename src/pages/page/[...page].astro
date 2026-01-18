@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+import type { GetStaticPathsOptions } from "astro";
+import Pagination from "../../components/Pagination.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { POSTS_PER_PAGE } from "../../consts/site.ts";
+import { sortBlogsByPublishedDesc } from "../../utils/sortBlogs";
+
+export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
+  const blogs = sortBlogsByPublishedDesc(await getCollection("blogs"));
+  return paginate(blogs, { pageSize: POSTS_PER_PAGE });
+};
+
+const { page } = Astro.props;
+const pageTitle = "記事一覧";
+---
+
+<BaseLayout
+  title={`${pageTitle}(${page.currentPage}ページ目)`}
+  description={`${pageTitle}の${page.currentPage}ページ目です。`}
+  noindex={true}
+>
+  <main>
+    <header>
+      <h1>
+        {pageTitle}
+        <span>({page.currentPage}ページ目)</span>
+      </h1>
+    </header>
+
+    <ArticleCard blogs={page.data} />
+
+    <Pagination currentPage={page.currentPage} lastPage={page.lastPage} />
+  </main>
+</BaseLayout>
