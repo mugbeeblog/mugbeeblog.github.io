@@ -1,0 +1,54 @@
+---
+import "../styles/base/global.scss";
+
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+
+const GTM_ID = import.meta.env.PUBLIC_GTM_ID;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <BaseHead {...Astro.props} />
+
+    {
+      GTM_ID && (
+        <script type="text/partytown" define:vars={{ GTM_ID }}>
+          {(function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            const f = d.getElementsByTagName(s)[0];
+            const j = d.createElement(s);
+            const dl = l !== "dataLayer" ? `&l=${l}` : "";
+            j.async = true;
+            j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, "script", "dataLayer", GTM_ID)}
+        </script>
+      )
+    }
+  </head>
+
+  <body>
+    {
+      GTM_ID && (
+        <noscript>
+          <iframe
+            title="Google Tag Manager"
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+          />
+        </noscript>
+      )
+    }
+    <Header />
+
+    <slot />
+
+    <Footer />
+  </body>
+</html>

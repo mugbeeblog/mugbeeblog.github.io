@@ -1,23 +1,10 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_DESCRIPTION } from "../consts/site";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead description={SITE_DESCRIPTION} />
-  </head>
-
-  <body>
-    <Header />
-
-    <main>
-      <h1>🧑‍🚀 Hello, Astronaut!</h1>
-    </main>
-
-    <Footer />
-  </body>
-</html>
+<BaseLayout description={SITE_DESCRIPTION}>
+  <main>
+    <h1>🧑‍🚀 Hello, Astronaut!</h1>
+  </main>
+</BaseLayout>
