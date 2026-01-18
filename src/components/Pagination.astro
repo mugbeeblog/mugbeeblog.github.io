@@ -1,0 +1,76 @@
+---
+import { MAX_PAGE_LINKS } from "../consts/site";
+
+type Props = {
+  currentPage: number;
+  lastPage: number;
+  basePath?: string;
+};
+
+const { currentPage, lastPage, basePath = "" } = Astro.props as Props;
+
+const normalizeBasePath = (path: string) => {
+  if (!path) return "";
+  return path.endsWith("/") ? path.slice(0, -1) : path;
+};
+
+const base = normalizeBasePath(basePath);
+
+const getHref = (page: number): string => {
+  if (page === 1) {
+    return base ? `${base}/` : "/";
+  }
+  return base ? `${base}/${page}/` : `/page/${page}/`;
+};
+
+const getPages = (): Array<number | "dots"> => {
+  if (lastPage <= MAX_PAGE_LINKS) {
+    return Array.from({ length: lastPage }, (_, i) => i + 1);
+  }
+
+  const pages: Array<number | "dots"> = [1];
+  const centerSlots = MAX_PAGE_LINKS - 2;
+  const sidePages = Math.floor(centerSlots / 2);
+
+  if (currentPage <= sidePages + 1) {
+    for (let i = 2; i <= centerSlots + 1; i++) pages.push(i);
+    pages.push("dots");
+  } else if (currentPage >= lastPage - sidePages) {
+    pages.push("dots");
+    for (let i = lastPage - centerSlots; i < lastPage; i++) pages.push(i);
+  } else {
+    pages.push("dots");
+    for (let i = currentPage - sidePages; i <= currentPage + sidePages; i++) {
+      pages.push(i);
+    }
+    pages.push("dots");
+  }
+
+  pages.push(lastPage);
+  return pages;
+};
+
+const pages = getPages();
+---
+
+<nav>
+  <ul>
+    {
+      pages.map((page) =>
+        page === "dots" ? (
+          <li>
+            <span class="dots">…</span>
+          </li>
+        ) : (
+          <li>
+            {page === currentPage ? (
+              <span>{page}</span>
+            ) : (
+              <a href={getHref(page)}>{page}</a>
+            )}
+          </li>
+        ),
+      )
+    }
+  </ul>
+</nav>

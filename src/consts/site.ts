@@ -21,3 +21,7 @@ export const SOCIAL_LINKS = [
     icon: "x",
   },
 ] as const;
+
+// page
+export const POSTS_PER_PAGE = 6;
+export const MAX_PAGE_LINKS = 6;
