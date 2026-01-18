@@ -29,18 +29,22 @@ const getPages = (): Array<number | "dots"> => {
   }
 
   const pages: Array<number | "dots"> = [1];
-  const centerSlots = MAX_PAGE_LINKS - 2;
-  const sidePages = Math.floor(centerSlots / 2);
+  const numCenterPages = MAX_PAGE_LINKS - 4;
+  const halfCenter = Math.floor(numCenterPages / 2);
 
-  if (currentPage <= sidePages + 1) {
-    for (let i = 2; i <= centerSlots + 1; i++) pages.push(i);
+  if (currentPage <= halfCenter + 2) {
+    for (let i = 2; i <= MAX_PAGE_LINKS - 2; i++) pages.push(i);
     pages.push("dots");
-  } else if (currentPage >= lastPage - sidePages) {
+  } else if (currentPage >= lastPage - halfCenter - 1) {
     pages.push("dots");
-    for (let i = lastPage - centerSlots; i < lastPage; i++) pages.push(i);
+    for (let i = lastPage - (MAX_PAGE_LINKS - 3); i < lastPage; i++) {
+      pages.push(i);
+    }
   } else {
     pages.push("dots");
-    for (let i = currentPage - sidePages; i <= currentPage + sidePages; i++) {
+    const start = currentPage - halfCenter;
+    const end = currentPage + halfCenter;
+    for (let i = start; i <= end; i++) {
       pages.push(i);
     }
     pages.push("dots");
