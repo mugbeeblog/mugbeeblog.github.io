@@ -1,0 +1,41 @@
+---
+type TaxonomyItem = {
+  id: string;
+  name: string;
+  slug?: string;
+};
+
+type Props = {
+  category?: TaxonomyItem[];
+  tags?: TaxonomyItem[];
+};
+
+const { category = [], tags = [] } = Astro.props;
+const hasItems = category.length > 0 || tags.length > 0;
+---
+
+{
+  hasItems && (
+    <nav>
+      {category.length > 0 && (
+        <ul>
+          {category.map((c) => (
+            <li>
+              <a href={`/taxonomy/category/${c.slug ?? c.id}/`}>{c.name}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {tags.length > 0 && (
+        <ul>
+          {tags.map((t) => (
+            <li>
+              <a href={`/taxonomy/tag/${t.slug ?? t.id}/`}>#{t.name}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </nav>
+  )
+}
