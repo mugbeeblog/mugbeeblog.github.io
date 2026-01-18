@@ -1,0 +1,40 @@
+---
+import { SOCIAL_LINKS } from "../consts/site";
+import SocialLinkIcon from "./SocialLinkIcon.astro";
+---
+
+<nav>
+  <ul class="social-links">
+    {
+      SOCIAL_LINKS.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            title={link.title}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <SocialLinkIcon name={link.icon} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+<style>
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 1em;
+  }
+
+  .social-links a {
+    text-decoration: none;
+    color: rgb(var(--gray));
+  }
+
+  .social-links a:hover {
+    color: rgb(var(--gray-dark));
+  }
+</style>

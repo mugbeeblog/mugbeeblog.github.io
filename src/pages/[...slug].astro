@@ -1,0 +1,105 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { formatJPDate } from "../utils/date";
+import { optimizeImageUrl } from "../utils/optimizeImage";
+import { IMAGE_PRESETS } from "../consts/imagePresets";
+
+import {
+  microCMSRichEditorHandler,
+  responsiveImageTransformer,
+} from "microcms-rich-editor-handler";
+
+type Props = {
+  blog: CollectionEntry<"blogs">;
+  relatedBlogs: CollectionEntry<"blogs">[];
+};
+
+export async function getStaticPaths() {
+  const blogs = await getCollection("blogs");
+
+  return blogs.map((blog) => ({
+    params: { slug: blog.data.slug },
+    props: { blog },
+  }));
+}
+
+const { blog } = Astro.props as Props;
+
+const publishedDate = formatJPDate(blog.data.publishedAt);
+const updatedDate = formatJPDate(blog.data.updatedAt);
+
+const thumbnail = blog.data.thumbnail;
+const thumbnailUrl = thumbnail?.url ?? "/images/no-images.webp";
+
+const optimizedThumbnailUrl = optimizeImageUrl(
+  thumbnailUrl,
+  IMAGE_PRESETS.hero,
+);
+
+const ogImage = thumbnail ? new URL(thumbnail.url, Astro.site).href : undefined;
+
+const { html: optimizedContent } = await microCMSRichEditorHandler(
+  blog.data.content,
+  {
+    transformers: [
+      responsiveImageTransformer({
+        attributes: {
+          sizes: "(max-width: 768px) 100vw, 800px",
+          loading: "lazy",
+          decoding: "async",
+        },
+        formats: ["default", "webp"],
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+      }),
+    ],
+  },
+);
+---
+
+<BaseLayout
+  ogType="article"
+  title={blog.data.title}
+  description={blog.data.description}
+  ogImage={ogImage}
+>
+  <main>
+    <Image
+      src={optimizedThumbnailUrl}
+      alt={blog.data.title}
+      width={800}
+      height={450}
+      densities={[1.5, 2]}
+      loading="eager"
+      fetchpriority="high"
+    />
+
+    <header>
+      {
+        blog.data.updatedAt > blog.data.publishedAt && (
+          <span>
+            更新:
+            <time datetime={blog.data.updatedAt.toISOString()}>
+              {updatedDate}
+            </time>
+            {" / "}
+          </span>
+        )
+      }
+
+      <span>
+        公開:
+        <time datetime={blog.data.publishedAt.toISOString()}>
+          {publishedDate}
+        </time>
+      </span>
+
+      <h1>{blog.data.title}</h1>
+    </header>
+
+    <article>
+      <div set:html={optimizedContent} />
+    </article>
+  </main>
+</BaseLayout>
