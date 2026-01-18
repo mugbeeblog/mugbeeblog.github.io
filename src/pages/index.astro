@@ -2,14 +2,23 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleCard from "../components/ArticleCard.astro";
+import Pagination from "../components/Pagination.astro";
 import { sortBlogsByPublishedDesc } from "../utils/sortBlogs";
-import { SITE_DESCRIPTION } from "../consts/site";
+import { SITE_DESCRIPTION, POSTS_PER_PAGE } from "../consts/site";
 
 const blogs = sortBlogsByPublishedDesc(await getCollection("blogs"));
+const firstPageBlogs = blogs.slice(0, POSTS_PER_PAGE);
+const lastPage = Math.ceil(blogs.length / POSTS_PER_PAGE);
 ---
 
 <BaseLayout description={SITE_DESCRIPTION}>
   <main>
-    <ArticleCard blogs={blogs} />
+    <ArticleCard blogs={firstPageBlogs} />
+
+    {
+      lastPage > 1 && (
+        <Pagination currentPage={1} lastPage={lastPage} basePath="/page" />
+      )
+    }
   </main>
 </BaseLayout>
