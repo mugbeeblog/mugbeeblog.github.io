@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "gc": "git-cz"
+    "gc": "git-cz",
+    "cspell": "cspell lint '**' --no-progress"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.15",
@@ -19,6 +20,7 @@
     "sharp": "^0.34.3"
   },
   "devDependencies": {
+    "cspell": "^9.6.0",
     "git-cz": "^4.9.0"
   }
 }
