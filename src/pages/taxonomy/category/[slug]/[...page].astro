@@ -1,0 +1,63 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import type { GetStaticPathsOptions, Page } from "astro";
+
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ArticleCard from "../../../../components/ArticleCard.astro";
+import Pagination from "../../../../components/Pagination.astro";
+import { POSTS_PER_PAGE } from "../../../../consts/site";
+import { groupPostsByTaxonomy } from "../../../../utils/taxonomy";
+
+export const getStaticPaths = async ({ paginate }: GetStaticPathsOptions) => {
+  const allPosts = await getCollection("blogs");
+  const categoryMap = groupPostsByTaxonomy(
+    allPosts,
+    (post) => post.data.category,
+  );
+
+  const paths = [];
+
+  for (const { name, slug, posts } of categoryMap.values()) {
+    const paginated = paginate(posts, {
+      pageSize: POSTS_PER_PAGE,
+      params: { slug },
+      props: { name },
+    });
+
+    paths.push(...paginated);
+  }
+
+  return paths;
+};
+
+type Props = {
+  page: Page<CollectionEntry<"blogs">>;
+  name: string;
+};
+
+const { page, name } = Astro.props as Props;
+---
+
+<BaseLayout
+  title={`カテゴリ: ${name} - ${page.currentPage}ページ目`}
+  description=""
+  noindex={true}
+>
+  <main>
+    <header>
+      <h1>
+        カテゴリ： {name}
+        <span>（ {page.total}件 - {page.currentPage}ページ目 ）</span>
+      </h1>
+    </header>
+
+    <ArticleCard blogs={page.data} />
+
+    <Pagination
+      currentPage={page.currentPage}
+      lastPage={page.lastPage}
+      basePath={`/taxonomy/category/${Astro.params.slug}`}
+    />
+  </main>
+</BaseLayout>

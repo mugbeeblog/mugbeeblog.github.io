@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Taxonomy from "../components/Taxonomy.astro";
 import { formatJPDate } from "../utils/date";
 import { optimizeImageUrl } from "../utils/optimizeImage";
 import { IMAGE_PRESETS } from "../consts/imagePresets";
@@ -96,6 +97,8 @@ const { html: optimizedContent } = await microCMSRichEditorHandler(
       </span>
 
       <h1>{blog.data.title}</h1>
+
+      <Taxonomy category={blog.data.category} tags={blog.data.tags} />
     </header>
 
     <article>
