@@ -1,0 +1,73 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import { formatJPDate } from "../utils/date";
+import { optimizeImageUrl } from "../utils/optimizeImage";
+import { IMAGE_PRESETS } from "../consts/imagePresets";
+
+interface Props {
+  blogs: CollectionEntry<"blogs">[];
+}
+
+const { blogs } = Astro.props;
+
+const DEFAULT_THUMBNAIL_PATH = "/images/no-images.webp";
+const DESCRIPTION_MAX_LENGTH = 80;
+
+function truncateText(text: string, maxLength: number): string {
+  return text.length <= maxLength
+    ? text
+    : `${text.slice(0, maxLength).trim()}…`;
+}
+---
+
+{
+  blogs.length > 0 ? (
+    <ul>
+      {blogs.map((post) => {
+        const postUrl = `/${post.data.slug}/`;
+        const postDate = post.data.publishedAt;
+
+        const thumbnail = post.data.thumbnail;
+        const thumbnailUrl = thumbnail?.url ?? DEFAULT_THUMBNAIL_PATH;
+
+        const optimizedUrl = optimizeImageUrl(thumbnailUrl, IMAGE_PRESETS.card);
+
+        const thumbnailAlt = thumbnail
+          ? `${post.data.title}のサムネイル画像`
+          : "デフォルト画像";
+
+        return (
+          <li>
+            <article>
+              <a href={postUrl} aria-label={post.data.title}>
+                <Image
+                  src={optimizedUrl}
+                  alt={thumbnailAlt}
+                  width={400}
+                  height={400}
+                />
+              </a>
+
+              <time datetime={postDate.toISOString()}>
+                {formatJPDate(postDate)}
+              </time>
+
+              <h2>
+                <a href={postUrl}>{post.data.title}</a>
+              </h2>
+
+              {post.data.description && (
+                <p>
+                  {truncateText(post.data.description, DESCRIPTION_MAX_LENGTH)}
+                </p>
+              )}
+            </article>
+          </li>
+        );
+      })}
+    </ul>
+  ) : (
+    <p>記事がありません。</p>
+  )
+}
