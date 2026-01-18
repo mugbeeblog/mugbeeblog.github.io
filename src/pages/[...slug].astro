@@ -1,8 +1,9 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
-import BaseLayout from "../layouts/BaseLayout.astro";
+import PageLayout from "../layouts/PageLayout.astro";
 import Taxonomy from "../components/Taxonomy.astro";
+import RelatedPosts from "../components/RelatedPosts.astro";
 import { formatJPDate } from "../utils/date";
 import { optimizeImageUrl } from "../utils/optimizeImage";
 import { IMAGE_PRESETS } from "../consts/imagePresets";
@@ -19,14 +20,21 @@ type Props = {
 
 export async function getStaticPaths() {
   const blogs = await getCollection("blogs");
+  const blogsMap = new Map(blogs.map((b) => [b.id, b]));
 
-  return blogs.map((blog) => ({
-    params: { slug: blog.data.slug },
-    props: { blog },
-  }));
+  return blogs.map((blog) => {
+    const relatedBlogs = (blog.data.relatedPosts ?? [])
+      .map((p) => blogsMap.get(p.id))
+      .filter((b): b is NonNullable<typeof b> => b !== undefined);
+
+    return {
+      params: { slug: blog.data.slug },
+      props: { blog, relatedBlogs },
+    };
+  });
 }
 
-const { blog } = Astro.props as Props;
+const { blog, relatedBlogs } = Astro.props;
 
 const publishedDate = formatJPDate(blog.data.publishedAt);
 const updatedDate = formatJPDate(blog.data.updatedAt);
@@ -59,7 +67,7 @@ const { html: optimizedContent } = await microCMSRichEditorHandler(
 );
 ---
 
-<BaseLayout
+<PageLayout
   ogType="article"
   title={blog.data.title}
   description={blog.data.description}
@@ -105,4 +113,6 @@ const { html: optimizedContent } = await microCMSRichEditorHandler(
       <div set:html={optimizedContent} />
     </article>
   </main>
-</BaseLayout>
+
+  <RelatedPosts slot="relatedPosts" contents={relatedBlogs} title="関連記事" />
+</PageLayout>

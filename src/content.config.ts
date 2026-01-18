@@ -23,6 +23,14 @@ const taxonomySchema = z.object({
   slug: z.string().optional(),
 });
 
+const relatedPostsSchema = z
+  .array(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .optional();
+
 const blogs = defineCollection({
   loader: createMicroCMSLoader("blogs"),
   schema: z
@@ -38,6 +46,7 @@ const blogs = defineCollection({
         .max(1, "カテゴリは1記事に1つ")
         .optional(),
       tags: z.array(taxonomySchema).optional(),
+      relatedPosts: relatedPostsSchema,
     })
     .merge(microCMSDateFieldsSchema),
 });
